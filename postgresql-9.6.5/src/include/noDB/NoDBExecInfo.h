@@ -95,8 +95,10 @@ typedef struct NoDBExecInfoVector_t
 
 
 
-NoDBExecInfo_t      *NoDBExecInfoInit(NoDBRelation_t *rel, char *filename, long budgetPM, long budgetCache);
+int      *NoDBExecInfoInit(NoDBRelation_t *rel, char *filename, long budgetPM, long budgetCache);
 NoDBExecInfo_t      *NoDBGetExecInfo(char* relation);
+NoDBExecInfo_t *NoDBGetExecInfoForIndex(int index);
+int      *NoDBGetExecInfoIndex(char* relation);
 
 
 NoDBColVector_t     NoDBNothingPolicy(void);

@@ -28,7 +28,7 @@ USE OF THIS SOFTWARE.
 #include "noDB/NoDBCache.h"
 
 #define MAX_RELATION_NAME    64
-#define NELLEM_ALLOC         5
+#define NELLEM_ALLOC         10
 
 typedef struct NoDBEOLCache_t
 {

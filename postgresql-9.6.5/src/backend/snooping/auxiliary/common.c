@@ -45,7 +45,7 @@ static int parse(char *buf, char **args);
 
 void initialiazeConfiguration(void);
 //void printConfiguration(void);
-int checkConfiguration(void);
+//int checkConfiguration(void);
 int searchSlotInConfiguration(int value);
 
 
@@ -57,52 +57,56 @@ char *configuration_filename = "snoop.conf";
 //Mapping data-file, relation, delimiter
 ConfigurationFile CF;
 
-
-
-char *getInputFilename(char *relation)
+int getRelationIndex(char *relation)
 {
-	int i;
-	if(CF.loaded != true)
-		return NULL;
-	for ( i = 0; i < NUMBER_OF_RELATIONS; i++){
-		if( CF.files[i].id != -1)
-		{
-			if(strcmp(CF.files[i].relation, relation) == 0)
-				return CF.files[i].filename;
-		}
-	}
-	return NULL;
+    int i;
+    if(CF.loaded != true)
+            return -1;
+    for ( i = 0; i < NUMBER_OF_RELATIONS; i++){
+            if( CF.files[i].id != -1)
+            {
+                    if(strcmp(CF.files[i].relation, relation) == 0)
+                            return i;
+            }
+    }
+    return -1;
+}
+
+char *getInputFilename(char *relation){
+    return getInputFilenameByIndex(getRelationIndex(relation));
+}
+
+char *getInputFilenameByIndex(int index)
+{
+    if(CF.loaded != true || index == -1)
+            return NULL;
+    return CF.files[index].filename;
 }
 
 char *getDelimiter(char *relation)
 {
-	int i;
-	if(CF.loaded != true)
-		return NULL;
-	for ( i = 0; i < NUMBER_OF_RELATIONS; i++){
-		if( CF.files[i].id != -1)
-		{
-			if(strcmp(CF.files[i].relation, relation) == 0)
-				return CF.files[i].delimiter;
-		}
-	}
-	return NULL;
+    return getDelimiterByIndex(getRelationIndex(relation));
+}
+
+char *getDelimiterByIndex(int index)
+{	
+    if(CF.loaded != true || index == -1)
+            return NULL;	
+    return CF.files[index].delimiter;        
 }
 
 bool getHeader(char *relation)
 {
-	int i;
-	if(CF.loaded != true)
-		return false;
-	for ( i = 0; i < NUMBER_OF_RELATIONS; i++){
-		if( CF.files[i].id != -1)
-		{
-			if(strcmp(CF.files[i].relation, relation) == 0)
-				return CF.files[i].header;
-		}
-	}
-	return false;
+    return getHeaderByIndex(getRelationIndex(relation));
 }
+
+bool getHeaderByIndex(int index)
+{
+    if(CF.loaded != true || index == -1)
+            return false;
+    return CF.files[index].header;  
+}
+
 /*
 bool isBuild(void)
 {
@@ -178,47 +182,45 @@ printConfiguration(void)
 	fprintf(stdout,"\n\n");
 }
 
-int
-checkConfiguration(void)
-{
-	int i = 0;
-	for ( i = 0; i < NUMBER_OF_RELATIONS; i++)
-		if( CF.files[i].id != -1)
-			if ( strlen(CF.files[i].filename) == 0 || strlen(CF.files[i].relation) == 0 || strlen(CF.files[i].delimiter) == 0)
-				return -1;
-	return 1;
-}
+//int
+//checkConfiguration(void)
+//{
+//	int i = 0;
+//	for ( i = 0; i < NUMBER_OF_RELATIONS; i++)
+//		if( CF.files[i].id != -1)
+//			if ( strlen(CF.files[i].filename) == 0 || strlen(CF.files[i].relation) == 0 || strlen(CF.files[i].delimiter) == 0)
+//				return -1;
+//	return 1;
+//}
 
 
 int
 searchSlotInConfiguration(int value)
 {
-	int i = 0;
-	for ( i = 0; i < NUMBER_OF_RELATIONS; i++)
-		if( CF.files[i].id == value)
-			return i;
-	for ( i = 0; i < NUMBER_OF_RELATIONS; i++)
-		if( CF.files[i].id == -1)
-		{
-			CF.how_many++;
-			return i;
-		}
+        if( CF.files[value-1].id == value)
+                return value-1;
+
+        if( CF.files[value-1].id == -1)
+        {
+                CF.how_many++;
+                return value-1;
+        }
 	return -1;
 }
 
 bool
 isInConfigFile(char *relation)
 {
-	int i = 0 ;
-	for( i = 0; i < NUMBER_OF_RELATIONS; i++)
-	{
-		if (CF.files[i].id != -1)
-		{
-			if( strcmp (CF.files[i].relation, relation) == 0)
-				return true;
-		}
-	}
-	return false;
+    return isInConfigFileByIndex(getRelationIndex(relation));
+}
+
+bool isInConfigFileByIndex(int index)
+{
+    if(index==-1)
+    {
+        return false; 
+    }
+    return true;
 }
 
 
@@ -331,7 +333,7 @@ loadEnvironment(void)
 	CF.loaded = true;
 
 	Assert( CF.how_many < NUMBER_OF_RELATIONS);
-	Assert( checkConfiguration() != -1);
+//	Assert( checkConfiguration() != -1);
 
 	//printConfiguration();
 }

@@ -28,7 +28,7 @@ USE OF THIS SOFTWARE.
 #include "noDB/auxiliary/NoDBMalloc.h"
 #include "noDB/auxiliary/NoDBRow.h"
 
-#define NODB_CACHE_DEFAULT_ROWS         5                       // Default number of rows to add to a cache.
+#define NODB_CACHE_DEFAULT_ROWS         6                       // Default number of rows to add to a cache.
 
 
 NoDBEOLCacheWorld_t *EOLCaches = NULL;

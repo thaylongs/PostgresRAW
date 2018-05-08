@@ -42,7 +42,7 @@ static NoDBExecInfoVector_t *ExecInfo = NULL;
 static uint32 NoDBComputeNumberOfBlocks(char* filename);
 
 
-NoDBExecInfo_t *NoDBExecInfoInit(NoDBRelation_t *rel, char *filename, long budgetPM, long budgetCache)
+int *NoDBExecInfoInit(NoDBRelation_t *rel, char *filename, long budgetPM, long budgetCache)
 {
     int i;
     int j;
@@ -65,7 +65,7 @@ NoDBExecInfo_t *NoDBExecInfoInit(NoDBRelation_t *rel, char *filename, long budge
     if ( i == ExecInfo->size )
     {
         NoDBExecInfo_t *tmp;
-        ExecInfo->size += NELLEM_ALLOC;
+        ExecInfo->size *= 2;
         tmp = (NoDBExecInfo_t*) NoDBRealloc (ExecInfo->vector, ExecInfo->size * sizeof(NoDBExecInfo_t));
         if ( tmp != NULL )
             ExecInfo->vector = tmp;
@@ -106,7 +106,7 @@ NoDBExecInfo_t *NoDBExecInfoInit(NoDBRelation_t *rel, char *filename, long budge
 
     ExecInfo->used++;
 
-    return &ExecInfo->vector[i];
+    return i;
 }
 
 
@@ -126,6 +126,30 @@ NoDBExecInfo_t *NoDBGetExecInfo(char* relation)
     return NULL;
 }
 
+NoDBExecInfo_t *NoDBGetExecInfoForIndex(int index)
+{
+    //First time accessing the PolicyInfo
+    if ( !ExecInfo  || index == -1 )
+        return NULL;
+    return &ExecInfo->vector[index];    
+}
+
+
+int *NoDBGetExecInfoIndex(char* relation)
+{
+    int i;
+
+    //First time accessing the PolicyInfo
+    if ( !ExecInfo )
+        return NULL;
+
+    for (i = 0 ; i < ExecInfo->used; i++)
+    {
+        if ( strcmp(ExecInfo->vector[i].rel->name, relation) == 0 )
+            return  i;
+    }
+    return NULL;
+}
 
 
 NoDBColVector_t NoDBNothingPolicy(void)

@@ -132,6 +132,9 @@ bool enable_pushdown_select 		= false;
 
 
 
+void NoDBScanResetExecInfoOfCstate(ScanState *scanInfo){
+    scanInfo->scanOper->cstate->execInfo = NoDBGetExecInfoForIndex(scanInfo->scanOper->cstate->execInfoIndexInVector);            
+}
 
 NoDBScanOperator_t *NoDBScanOperatorInit(ScanState *scanInfo)
 {
@@ -154,9 +157,10 @@ NoDBScanOperator_t *NoDBScanOperatorInit(ScanState *scanInfo)
     //TODO:NoDB specific fucntions + add time stamp if the snoop.conf has changed
     Assert(isLoaded());
 
-    filename = getInputFilename(relation);
-    delimiter = getDelimiter(relation);
-    header = getHeader(relation);
+    int relationIndex  =  getRelationIndex(relation);
+    filename = getInputFilenameByIndex(relationIndex);
+    delimiter = getDelimiterByIndex(relationIndex);
+    header = getHeaderByIndex(relationIndex);
 
 
     Assert(filename != NULL);
@@ -373,16 +377,19 @@ NoDBScanStateInit(NoDBScanState_t cstate, ScanState *scanInfo)
 
 
     //Init Relation if not already there
-    cstate->execInfo = NoDBGetExecInfo(relation);
-    if( !cstate->execInfo )
+
+    if (cstate->execInfoIndexInVector == -1);
     {
         NoDBRelation_t *rel = NoDBRelationInit(relation);
         for ( i = 0; i < natts; i++) {
             NoDBRelationAddColumn(rel, sizeof(NoDBDatum_t), cstate->attr[i]->attbyval);
         }
-        cstate->execInfo = NoDBExecInfoInit(rel, cstate->filename, 0, 0);
+        cstate->execInfoIndexInVector = NoDBExecInfoInit(rel, cstate->filename, 0, 0);
+        cstate->execInfo = NoDBGetExecInfoForIndex(cstate->execInfoIndexInVector);
         //Estimation
         NoDBExecSetNumberOffBlocks(cstate->execInfo);
+    }else{
+    	cstate->execInfo = NoDBGetExecInfoForIndex(cstate->execInfoIndexInVector);
     }
 
     if ( (size = NoDBColVectorSize(cstate->readAllAtts)) > 0 )
@@ -768,6 +775,7 @@ GetScanState(const CopyStmt *stmt, const char *queryString)
 
 	/* Allocate workspace and zero all fields */
 	cstate = (NoDBScanStateData_t *) palloc0(sizeof(NoDBScanStateData_t));
+    cstate->execInfoIndexInVector = -1;
 	/* Extract options from the statement node tree */
 	foreach(option, stmt->options)
 	{

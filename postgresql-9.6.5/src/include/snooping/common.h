@@ -51,14 +51,18 @@ typedef struct ConfigurationFile
 
 extern char *configuration_filename;
 
-
+int     getRelationIndex(char *relation);
 char    *getInputFilename(char *relation);
+char    *getInputFilenameByIndex(int index);
 char    *getDelimiter(char *relation);
+char    *getDelimiterByIndex(int index);
 bool    getHeader(char *relation);
+bool    getHeaderByIndex(int index);
 bool    isBuild(void);
 bool    isLoaded(void);
 bool    configurationExists(void);
 bool    isInConfigFile(char *relation);
+bool    isInConfigFileByIndex(int index);
 void    loadEnvironment(void);
 void    printConfiguration(void);
 int     getFirstFreeFromMap(int *map, int size);

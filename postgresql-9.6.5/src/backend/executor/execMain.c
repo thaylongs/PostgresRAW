@@ -1747,8 +1747,14 @@ ExecutePlan2(EState *estate,
 		if (NoDBBreakDown && isForNoDB)
 		    NoDBTimerSetZero(&NoDBLastQueryBreakdown);
 	}
-
-	/*
+		ListCell *cur;
+		foreach(cur, planstateList){
+		    ScanState *scanInfo = lfirst(cur);
+		    if (scanInfo){
+		        NoDBScanResetExecInfoOfCstate(scanInfo);
+		    }
+		}
+    /*
 	 * Loop until we've processed the proper number of tuples from the plan.
 	 */
 	for (;;)
@@ -1773,6 +1779,7 @@ ExecutePlan2(EState *estate,
 					ScanState *scanInfo = lfirst(cur);
 					if (scanInfo->ss_currentRelation  && isInConfigFile(scanInfo->ss_currentRelation->rd_rel->relname.data))
 					{
+                        NoDBScanResetExecInfoOfCstate(scanInfo);
 					    if(NoDBBreakDown)  {
                             NoDBTimerSumElapsed(&NoDBLastQueryBreakdown, scanInfo->scanOper->cstate->timer);
 					    }

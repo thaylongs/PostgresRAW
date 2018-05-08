@@ -162,6 +162,7 @@ typedef struct NoDBScanStateData_t
 
 	struct NoDBPlanState_t  *plan;
 	NoDBExecInfo_t          *execInfo;
+    int execInfoIndexInVector;
 
 	// For generating the tuple
 	TupleTableSlot          *ss_ScanTupleSlot;
