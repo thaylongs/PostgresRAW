@@ -378,7 +378,7 @@ NoDBScanStateInit(NoDBScanState_t cstate, ScanState *scanInfo)
 
     //Init Relation if not already there
 
-    if (cstate->execInfoIndexInVector == -1);
+    if (cstate->execInfoIndexInVector == -1)
     {
         NoDBRelation_t *rel = NoDBRelationInit(relation);
         for ( i = 0; i < natts; i++) {
